@@ -91,10 +91,10 @@ const DraggableSquares = () => {
           className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg hover:bg-gray-50"
           onClick={addSquare}
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="text-black w-6 h-6" />
         </button>
 
-        <div className="bg-white p-4 rounded shadow space-y-2">
+        <div className="text-black p-4 rounded shadow space-y-2">
           <div className="font-medium">Square Positions:</div>
           {squares.map(square => (
             <div key={square.id} className="text-sm">
