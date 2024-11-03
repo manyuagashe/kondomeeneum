@@ -1,0 +1,48 @@
+{
+    "attributes": {
+        "width": 144,
+        "length": 180
+    },
+    "features": [
+        {
+            "name": "door",
+            "x": 18,
+            "y": 0,
+            "width": 36,
+            "rotation": 0
+        },
+        {
+            "name": "window",
+            "x": 144,
+            "y": 90,
+            "width": 60,
+            "rotation": 90
+        }
+    ],
+    "items": [
+        {
+            "name": "bed",
+            "x": 72,
+            "y": 106,
+            "width": 75,
+            "length": 38,
+            "rotation": 180
+        },
+        {
+            "name": "desk",
+            "x": 12,
+            "y": 51,
+            "width": 30,
+            "length": 15,
+            "rotation": 180
+        },
+        {
+            "name": "lamp",
+            "x": 6,
+            "y": 160,
+            "width": 12,
+            "length": 12,
+            "rotation": 0
+        }
+    ]
+}
