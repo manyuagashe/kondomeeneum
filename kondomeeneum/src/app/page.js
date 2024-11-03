@@ -1,3 +1,10 @@
+"use client";
+import DraggableSquares from "@/components/DraggableSquares";
+
 export default function Home() {
-  return <p>test</p>
+  return (
+    <>
+      <DraggableSquares />
+    </>
+  )
 }
