@@ -5,7 +5,8 @@ import Walls from './Walls';
 const DraggableSquares = () => {
   const currRef = useRef(null);
   const editorRef = useRef(null);
-  const [selected, setSelected] = useState(null)
+  const containerRef = useRef(null);
+  const [selected, setSelected] = useState(null);
   const [input, setInput] = useState(null);
   const [roomDims, setRoomDims] = useState({ width: 500, height: 300 });
   const [roomInput, setRoomInput] = useState({ ...roomDims });
@@ -16,76 +17,91 @@ const DraggableSquares = () => {
       y: 100,
       width: 100,
       height: 100,
-      color: 'bg-blue-500',
       rotation: 0,
-      svgPath: '/couch.svg',
+      svgPath: '/couch.svg'
     }
   ]);
   const [dragInfo, setDragInfo] = useState(null);
   const [isRotating, setIsRotating] = useState(false);
 
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500',
-    'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500'
+  const furnitureItems = [
+    { path: '/couch.svg', name: 'Couch' },
   ];
 
   useEffect(() => {
     const callback = (e) => {
       if (currRef.current && !currRef.current.contains(e.target) && !editorRef.current.contains(e.target)) {
-        setSelected(null)
+        setSelected(null);
       }
-    }
-    document.addEventListener('click', callback, true)
+    };
+    document.addEventListener('click', callback, true);
     return () => {
-      document.removeEventListener('click', callback, true)
-    }
-  })
+      document.removeEventListener('click', callback, true);
+    };
+  });
+
 
   const addSquare = () => {
     const newId = Math.max(0, ...squares.map(s => s.id)) + 1;
-    const randomColor = colors[squares.length % colors.length];
     setSquares([...squares, {
       id: newId,
       x: 150 + (squares.length * 30),
       y: 150 + (squares.length * 30),
       width: 100,
       height: 100,
-      color: randomColor,
-      rotation: 0
+      rotation: 0,
+      svgPath: furnitureItems[0].path
     }]);
   };
 
   const removeSquare = (id) => {
     setSquares(squares.filter(square => square.id !== id));
+    setSelected(null);
   };
 
   const handleMouseDown = (e, id) => {
+    e.preventDefault(); // Prevent default drag behavior
+
     const square = squares.find(s => s.id === id);
-    const rect = e.target.getBoundingClientRect();
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    // Calculate the offset from the click point to the element's top-left corner
+    // taking into account the container's position
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
     setDragInfo({
       id,
-      offsetX: e.clientX - rect.left,
-      offsetY: e.clientY - rect.top,
+      offsetX,
+      offsetY,
       initialX: square.x,
-      initialY: square.y
+      initialY: square.y,
     });
+
     setSelected(id);
-    setInput({ width: square.width, height: square.height, rotation: square.rotation })
+    setInput({ width: square.width, height: square.height, rotation: square.rotation });
   };
 
   const handleRotateStart = (e, id) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsRotating(true);
     setSelected(id);
+
     const square = squares.find(s => s.id === id);
     const rect = currRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const initialAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+
     setDragInfo({
       id,
       initialAngle,
-      initialRotation: square.rotation
+      initialRotation: square.rotation,
+      centerX,
+      centerY
     });
   };
 
@@ -93,13 +109,12 @@ const DraggableSquares = () => {
     if (!dragInfo) return;
 
     if (isRotating) {
-      const rect = currRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const currentAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+      const currentAngle = Math.atan2(e.clientY - dragInfo.centerY, e.clientX - dragInfo.centerX);
       const angleDiff = (currentAngle - dragInfo.initialAngle) * (180 / Math.PI);
       let newRotation = (((dragInfo.initialRotation + angleDiff) % 360) + 360) % 360;
-      const snaps = [0, 90, 180, 270]
+
+      // Snap to common angles
+      const snaps = [0, 90, 180, 270];
       snaps.forEach(element => {
         if (newRotation < element + 10 && newRotation > element - 10) {
           newRotation = element;
@@ -113,8 +128,12 @@ const DraggableSquares = () => {
       ));
       setInput(prev => ({ ...prev, rotation: newRotation }));
     } else {
-      const newX = e.clientX - dragInfo.offsetX;
-      const newY = e.clientY - dragInfo.offsetY;
+      const container = containerRef.current;
+      const containerRect = container.getBoundingClientRect();
+
+      // Calculate new position relative to container
+      const newX = e.clientX - containerRect.left - dragInfo.offsetX;
+      const newY = e.clientY - containerRect.top - dragInfo.offsetY;
 
       setSquares(squares.map(square =>
         square.id === dragInfo.id
@@ -192,7 +211,8 @@ const DraggableSquares = () => {
 
   return (
     <div
-      className="relative w-screen h-screen bg-gray-100"
+      ref={containerRef}
+      className="relative w-full h-screen bg-gray-100 overflow-hidden"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
@@ -202,14 +222,15 @@ const DraggableSquares = () => {
         <div
           key={square.id}
           ref={square.id === selected ? currRef : null}
-          className={`absolute cursor-move rounded ${square.id === selected && 'outline-dashed outline-blue-400 outline-2'}`}
+          className={`absolute cursor-move ${selected === square.id ? 'outline-dashed outline-2 outline-blue-500' : ''}`}
           style={{
             left: `${square.x}px`,
             top: `${square.y}px`,
-            touchAction: 'none',
             width: `${square.width}px`,
             height: `${square.height}px`,
             transform: `rotate(${square.rotation}deg)`,
+            touchAction: 'none',
+            userSelect: 'none',
           }}
           onMouseDown={(e) => handleMouseDown(e, square.id)}
         >
@@ -217,14 +238,16 @@ const DraggableSquares = () => {
             <img
               src={square.svgPath}
               alt="Furniture item"
-              className="w-full h-full object-contain select-none pointer-events-none"
+              className="w-full h-full object-contain pointer-events-none"
               draggable="false"
+              style={{ userSelect: 'none' }}
             />
           </div>
+
           {square.id === selected && (
             <>
               <button
-                className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow hover:bg-red-100"
+                className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow-md hover:bg-red-100 z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeSquare(square.id);
@@ -238,7 +261,7 @@ const DraggableSquares = () => {
                 />
               </button>
               <button
-                className="absolute -top-2 -left-2 p-1 bg-white rounded-full shadow hover:bg-blue-100 cursor-pointer"
+                className="absolute -top-2 -left-2 p-1 bg-white rounded-full shadow-md hover:bg-blue-100 cursor-pointer z-10"
                 onMouseDown={(e) => handleRotateStart(e, square.id)}
               >
                 <RotateCcw
