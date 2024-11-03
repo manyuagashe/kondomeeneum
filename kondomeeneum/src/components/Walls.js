@@ -5,15 +5,11 @@ const Walls = ({ width, height }) => {
         x: 50,
         y: 50
     })
-    const [dims, setDims] = useState({
-        width,
-        height
-    })
     const corners = [
         corner,
-        { y: corner.y, x: corner.x + dims.width },
-        { y: corner.y + dims.height, x: corner.x + dims.width },
-        { y: corner.y + dims.height, x: corner.x },
+        { y: corner.y, x: corner.x + width },
+        { y: corner.y + height, x: corner.x + width },
+        { y: corner.y + height, x: corner.x },
     ]
     const radius = 12;
     const wallWidth = 10;
@@ -26,7 +22,7 @@ const Walls = ({ width, height }) => {
                 left: `${corner.x + radius - wallWidth/2}px`,
                 top: `${corner.y + radius - wallWidth/2}px`,
                 touchAction: 'none',
-                width: `${dims.width}px`,
+                width: `${width}px`,
                 height: `${wallWidth}px`,
               }}
           />
@@ -36,7 +32,7 @@ const Walls = ({ width, height }) => {
                 left: `${corners[3].x + radius - wallWidth/2}px`,
                 top: `${corners[3].y + radius - wallWidth/2}px`,
                 touchAction: 'none',
-                width: `${dims.width}px`,
+                width: `${width}px`,
                 height: `${wallWidth}px`,
               }}
           />
@@ -47,7 +43,7 @@ const Walls = ({ width, height }) => {
                 top: `${corner.y + radius - wallWidth/2}px`,
                 touchAction: 'none',
                 width: `${wallWidth}px`,
-                height: `${dims.height}px`,
+                height: `${height}px`,
               }}
           />
           <div 
@@ -57,7 +53,7 @@ const Walls = ({ width, height }) => {
                 top: `${corners[1].y + radius - wallWidth/2}px`,
                 touchAction: 'none',
                 width: `${wallWidth}px`,
-                height: `${dims.height}px`,
+                height: `${height}px`,
               }}
           />
           {corners.map((c, i) => (

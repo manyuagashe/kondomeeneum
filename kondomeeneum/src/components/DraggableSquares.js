@@ -7,6 +7,8 @@ const DraggableSquares = () => {
   const editorRef = useRef(null);
   const [selected, setSelected] = useState(null)
   const [input, setInput] = useState(null);
+  const [roomDims, setRoomDims] = useState({ width: 500, height: 300 });
+  const [roomInput, setRoomInput] = useState({ ...roomDims });
   const [squares, setSquares] = useState([
     {
       id: 1,
@@ -15,7 +17,9 @@ const DraggableSquares = () => {
       width: 100,
       height: 100,
       color: 'bg-blue-500',
-      rotation: 0
+      rotation: 0,
+      path: '.
+      '
     }
   ]);
   const [dragInfo, setDragInfo] = useState(null);
@@ -160,6 +164,34 @@ const DraggableSquares = () => {
     );
   };
 
+  const handleRoomChange = (e, field) => {
+    let value = parseInt(e.target.value);
+    if (isNaN(value)) {
+      value = ''
+    }
+    setRoomInput(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleRoomBlur = () => {
+    if (selected && roomInput) {
+      handleRoomSubmit();
+    }
+  };
+
+  const handleRoomSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (isNaN(roomInput.width) || isNaN(roomInput.height)) return;
+
+    const validatedInput = {
+      width: Math.max(1, Math.min(2000, parseInt(roomInput.width))),
+      height: Math.max(1, Math.min(2000, parseInt(roomInput.height))),
+    };
+
+    setRoomInput({ ...validatedInput });
+    setRoomDims({ ...validatedInput });
+  };
+
+  console.log(roomDims)
   return (
     <div
       className="relative w-screen h-screen bg-gray-100"
@@ -167,7 +199,7 @@ const DraggableSquares = () => {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <Walls width={500} height={600}/>
+      <Walls width={roomDims.width} height={roomDims.height} />
       {squares.map(square => (
         <div
           key={square.id}
@@ -217,13 +249,13 @@ const DraggableSquares = () => {
 
       <div ref={editorRef} className="fixed bottom-4 right-4 flex flex-row items-end">
         <div className="text-black p-4 rounded shadow space-y-4 flex flex-col">
-          <div className="font-medium">Dimensions:</div>
+          <div className="font-medium p-0">Item Dimensions:</div>
           {!selected ? (
-            <div>Nothing selected</div>
+            <div className='text-sm text-gray-600'>Nothing selected</div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className='text-sm'>
-                <label htmlFor='width' className='pr-3'>Width: </label>
+                <label htmlFor='width' className='pr-6'>Width: </label>
                 <input
                   className='bg-transparent max-w-16 border border-black border-solid rounded overflow-auto'
                   type='text'
@@ -234,7 +266,7 @@ const DraggableSquares = () => {
                 />
               </div>
               <div className='text-sm'>
-                <label htmlFor='height' className='pr-2'>Height: </label>
+                <label htmlFor='height' className='pr-5'>Height: </label>
                 <input
                   className='bg-transparent max-w-16 border border-black border-solid rounded overflow-auto'
                   type='text'
@@ -268,16 +300,16 @@ const DraggableSquares = () => {
           </button>
           <div className="text-black p-4 rounded shadow space-y-2">
             <div className="font-medium">Room Dimensions:</div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleRoomSubmit}>
               <div className='text-sm'>
                 <label htmlFor='width' className='pr-3'>Width: </label>
                 <input
                   className='bg-transparent max-w-16 border border-black border-solid rounded overflow-auto'
                   type='text'
                   id='width'
-                  value={input.width}
-                  onChange={(e) => handleChange(e, 'width')}
-                  onBlur={handleBlur}
+                  value={roomInput.width}
+                  onChange={(e) => handleRoomChange(e, 'width')}
+                  onBlur={handleRoomBlur}
                 />
               </div>
               <div className='text-sm'>
@@ -286,9 +318,9 @@ const DraggableSquares = () => {
                   className='bg-transparent max-w-16 border border-black border-solid rounded overflow-auto'
                   type='text'
                   id='height'
-                  value={input.height}
-                  onChange={(e) => handleChange(e, 'height')}
-                  onBlur={handleBlur}
+                  value={roomInput.height}
+                  onChange={(e) => handleRoomChange(e, 'height')}
+                  onBlur={handleRoomBlur}
                 />
               </div>
               <button type="submit" className="hidden" aria-hidden="true" />
