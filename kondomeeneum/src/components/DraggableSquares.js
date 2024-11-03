@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Trash2, RotateCcw } from 'lucide-react';
 import Walls from './Walls';
+import couch from '@/assets/couch.svg';
 
 const DraggableSquares = () => {
   const currRef = useRef(null);
@@ -18,6 +19,7 @@ const DraggableSquares = () => {
       height: 100,
       color: 'bg-blue-500',
       rotation: 0,
+      path: '@/assets/couch.svg'
     }
   ]);
   const [dragInfo, setDragInfo] = useState(null);
@@ -211,6 +213,7 @@ const DraggableSquares = () => {
             height: `${square.height}px`,
             transform: `rotate(${square.rotation}deg)`,
           }}
+          src={couch}
           onMouseDown={(e) => handleMouseDown(e, square.id)}
         >
           {square.id === selected && (
