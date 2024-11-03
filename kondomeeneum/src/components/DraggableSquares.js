@@ -18,8 +18,6 @@ const DraggableSquares = () => {
       height: 100,
       color: 'bg-blue-500',
       rotation: 0,
-      path: '.
-      '
     }
   ]);
   const [dragInfo, setDragInfo] = useState(null);
