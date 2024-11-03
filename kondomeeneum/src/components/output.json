@@ -1,0 +1,20 @@
+[
+    {
+        "name": "bed",
+        "x": 72,
+        "y": 135,
+        "rotation": 0
+    },
+    {
+        "name": "desk",
+        "x": 120,
+        "y": 36,
+        "rotation": 90
+    },
+    {
+        "name": "lamp",
+        "x": 24,
+        "y": 160,
+        "rotation": 0
+    }
+]
