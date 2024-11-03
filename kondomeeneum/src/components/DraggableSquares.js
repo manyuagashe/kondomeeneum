@@ -18,6 +18,7 @@ const DraggableSquares = () => {
       height: 100,
       color: 'bg-blue-500',
       rotation: 0,
+      svgPath: '/couch.svg',
     }
   ]);
   const [dragInfo, setDragInfo] = useState(null);
@@ -189,7 +190,6 @@ const DraggableSquares = () => {
     setRoomDims({ ...validatedInput });
   };
 
-  console.log(roomDims)
   return (
     <div
       className="relative w-screen h-screen bg-gray-100"
@@ -202,7 +202,7 @@ const DraggableSquares = () => {
         <div
           key={square.id}
           ref={square.id === selected ? currRef : null}
-          className={`absolute cursor-move rounded shadow-lg hover:shadow-xl transition-shadow ${square.id === selected ? 'bg-red-500' : square.color}`}
+          className={`absolute cursor-move rounded ${square.id === selected && 'outline-dashed outline-blue-400 outline-2'}`}
           style={{
             left: `${square.x}px`,
             top: `${square.y}px`,
@@ -213,6 +213,14 @@ const DraggableSquares = () => {
           }}
           onMouseDown={(e) => handleMouseDown(e, square.id)}
         >
+          <div className="w-full h-full relative">
+            <img
+              src={square.svgPath}
+              alt="Furniture item"
+              className="w-full h-full object-contain select-none pointer-events-none"
+              draggable="false"
+            />
+          </div>
           {square.id === selected && (
             <>
               <button
